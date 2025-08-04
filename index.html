@@ -1,0 +1,84 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>blade conversation transpiler</title>
+    <script src="index.js"></script>
+    <script>
+        let elms = {};
+
+        
+        function genNumbers() {
+            elms.genNumbers.value = '';
+            
+            var ln = (Array.from(elms.genList.value.matchAll('\n')).length) + 1;
+            for (let i = 1; i <= ln; i++) {
+                elms.genNumbers.value += i + '\n';
+            }
+        }
+        
+        
+        window.addEventListener("load", async function () {
+            elms = {
+                genList: document.getElementById('code'),
+                genNumbers: document.getElementById('code-numbers'),
+            };
+            elms.genList.addEventListener('scroll', (e) => {
+                elms.genNumbers.scrollTop = elms.genList.scrollTop;
+            });
+            
+            genNumbers();
+        });
+    </script>
+    <style>
+        #code-holder {
+        display: flex;
+        height: 400px;
+        background: #666;
+        border: 1px solid #666;
+        }
+
+        textarea {
+        outline: none;
+        background: #333;
+        color: #00ff00;
+        border: none;
+        height: 99%;
+        resize: none;
+        }
+
+        #code-numbers {
+        width: 3em;
+        text-align: right;
+        pointer-events: none;
+        overflow: hidden;
+        padding-right: 3px;
+        color:rgba(0, 255, 0, .7);
+        }
+
+        #code {
+        width: 100%;
+        padding-left: 3px;
+        margin-left: 1px;
+        white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>blade conversation transpiler</h1>
+    <p>.bcm &rightarrow; .lua</p>
+    <p>pro tip! after a successful transpilation, make sure to copy the WHOLE output, even a single character missing can mess things up!</p>
+    <p>pro tip! use compact transpilation when you are sure that the output wont be modified by hand!</p>
+    <hr>
+    <div id="code-holder">
+        <textarea id="code-numbers"></textarea>
+        <textarea id="code" oninput="genNumbers()" onchange="genNumbers()" placeholder=";; place your .bcm file here"></textarea>
+    </div>
+    <p style="font-size: larger; text-align: center;"><a href="javascript:void(0);" onclick="transpile(document.getElementById('code').value, true)">[transpile pretty]</a><a href="javascript:void(0);" onclick="transpile(document.getElementById('code').value, false)">[transpile compact]</a></p>
+    <p style="font-size: xx-large; text-align: center;">&downarrow;</p>
+    <p style="font-size: larger; text-align: center;"><a href="javascript:void(0);" onclick="document.getElementById('output_area').value = ''">[clear output]</a></p>
+    <textarea id="output_area" readonly placeholder="output" style="width: 100%; height: 300px"></textarea>
+    <hr>
+    <p>made by pinmacaroon, licensed under the MIT license. FOR INTERNAL USE ONLY</p>
+</body>
+</html>

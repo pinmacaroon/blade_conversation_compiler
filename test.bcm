@@ -1,0 +1,16 @@
+;; blade conversation markup
+;;
+;; heads up, empty lines are important, if you want to add ignorable lines
+;; use empty comments
+;;
+npc a
+neutral=73040329059377
+
+npc b
+neutral=13995194992
+
+;; "(" <sprite-id> ")" <whitespace> <participant> ":" <whitespace> <text> <end-of-line>
+(neutral) npc a: hello npc B you look great today
+(neutral) npc b: sup A, you also look fire
+(neutral) npc a: want to go on a quest together?
+(neutral) npc b: sure! i would gladly help my old friend!
