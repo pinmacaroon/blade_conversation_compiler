@@ -1,5 +1,5 @@
 // "[" <sound-id> "]" "(" <sprite-name> ")" <whitespace> <participant-name> ":" <whitespace> <text> <end-of-line>
-const LINE_REGEX = /^\s*\[(\d+)\]\s*\(([a-zA-Z1-9_]+)\)\s*([a-zA-Z0-9_\s]+):\s(.+)$/;
+const LINE_REGEX = /^\s*{\s*([0-9.]+)\s*}\s*\[\s*(\d+)\s*\]\s*\(\s*([a-zA-Z1-9_]+)\s*\)\s*([a-zA-Z0-9_\s]+):\s(.+)$/;
 // tis a command dawg, aint theoretical physics
 const COMMENT_REGEX = /^\s*(#|--|;;|\/\/).*$/;
 // <sprite-name> "=" <number>
@@ -62,22 +62,23 @@ function parse(lines) {
             if(line.trim().length == 0) return;
             else if((found = line.match(LINE_REGEX)) != null){
                 var object = {
-                    text: found[4],
-                    sprite: found[2],
-                    voice: found[1]
+                    text: found[5],
+                    sprite: found[3],
+                    voice: found[2],
+                    delay: found[1]
                 };
-                switch (found[3]) {
+                switch (found[4]) {
                     case result.participantA.name: object.subject = "participantA"; break;
                     case result.participantB.name: object.subject = "participantB"; break;
                     default:
-                        ERROR_MESSAGE = `error while parsing dialogue:\nline ${index}: participant "${found[3]}" has not been defined!\ncorrect: "${result.participantA.name}" or "${result.participantB.name}"!\n\n${index}:< ${line} >`;
+                        ERROR_MESSAGE = `error while parsing dialogue:\nline ${index}: participant "${found[4]}" has not been defined!\ncorrect: "${result.participantA.name}" or "${result.participantB.name}"!\n\n${index}:< ${line} >`;
                         alert(ERROR_MESSAGE);
                         error = true;
                         return;
                 }
                 result.conversationLines.push(object);
             } else {
-                ERROR_MESSAGE = `error while parsing dialogue:\nline ${index}: not a blank line or a dialogue line!\ncorrect:< [Sound_id](Sprite_name) Participant Name: Things I will say. >\n\n${index}:< ${line} >`;
+                ERROR_MESSAGE = `error while parsing dialogue:\nline ${index}: not a blank line or a dialogue line!\ncorrect:< {Delay}[Sound_id](Sprite_name) Participant Name: Things I will say. >\n\n${index}:< ${line} >`;
                 alert(ERROR_MESSAGE);
                 error = true;
                 return;
@@ -125,7 +126,7 @@ function produce_lua(input) {
     }
     result += "}},conversation={";
     input.conversationLines.forEach((line) => {
-        result += `{subject="${line.subject}",text="${line.text}",sprite="${line.sprite}",voice=${line.voice}},`;
+        result += `{subject="${line.subject}",text="${line.text}",sprite="${line.sprite}",voice=${line.voice},delay=${line.delay}},`;
     });
 
     result += "},";
@@ -152,7 +153,7 @@ function produce_pretty_lua(input) {
     }
     result += "        }\n    },\n    conversation = {\n";
     input.conversationLines.forEach((line) => {
-        result += `        {\n            subject = "${line.subject}",\n            text = "${line.text}",\n            sprite = "${line.sprite}",\n            voice = ${line.voice}\n        },\n`;
+        result += `        {\n            subject = "${line.subject}",\n            text = "${line.text}",\n            sprite = "${line.sprite}",\n            voice = ${line.voice},\n            delay = ${line.delay}\n        },\n`;
     });
 
     result += "    },\n"; 
