@@ -1,4 +1,4 @@
-// "[" <sound-id> "]" "(" <sprite-name> ")" <whitespace> <participant-name> ":" <whitespace> <text> <end-of-line>
+// {DELAY_SEC}[VOICE_ID](Sprite_name) Character Name: Line of text they will say.
 const LINE_REGEX = /^\s*{\s*([0-9.]+)\s*}\s*\[\s*(\d+)\s*\]\s*\(\s*([a-zA-Z1-9_]+)\s*\)\s*([a-zA-Z0-9_\s]+):\s(.+)$/;
 // tis a command dawg, aint theoretical physics
 const COMMENT_REGEX = /^\s*(#|--|;;|\/\/).*$/;
@@ -8,6 +8,27 @@ const SPRITE_REGEX = /^\s*([a-zA-Z0-9_]+)\s*=\s*(\d+)\s*$/;
 const CONFIG_REGEX = /^\s*\$\s*([a-zA-Z0-9_]+)\s*=\s*(\d+)\s*$/;
 
 var ERROR_MESSAGE = "";
+
+const EXAMPLE_FILE = `;; example
+;;
+$autonext = 0
+
+Aaron Doe
+Neutral = 110284753582699
+Smile   = 18110170834
+
+Beth Smith
+Neutral = 110284753582699
+Smile   = 18110170834
+
+;; {DELAY_SEC}[VOICE_ID](Sprite_name) Character Name: Line of text they will say.
+{0.6}[0](Neutral) Aaron Doe: Hello there!
+{0.6}[0](Smile) Aaron Doe: How is it going?
+{0.6}[0](Smile) Beth Smith: Nothin' much, i was just hanging out here.
+{0.6}[0](Neutral) Aaron Doe: Can i hang out too?
+{0.6}[0](Neutral) Beth Smith: Sure.
+{0.6}[0](Smile) Beth Smith: Its always great to have you around.
+`;
 
 function remove_junk(lines) {
     var result = [];
