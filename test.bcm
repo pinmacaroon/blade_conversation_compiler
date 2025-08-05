@@ -3,6 +3,8 @@
 ;; heads up, empty lines are important, if you want to add ignorable lines
 ;; use empty comments
 ;;
+$autonext=1
+
 npc a
 neutral=73040329059377
 

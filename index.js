@@ -4,6 +4,8 @@ const LINE_REGEX = /^\s*\[(\d+)\]\s*\(([a-zA-Z1-9_]+)\)\s*([a-zA-Z0-9_\s]+):\s(.
 const COMMENT_REGEX = /^\s*(#|--|;;|\/\/).*$/;
 // <sprite-name> "=" <number>
 const SPRITE_REGEX = /^\s*([a-zA-Z0-9_]+)\s*=\s*(\d+)\s*$/;
+// <config-key> "=" <number>
+const CONFIG_REGEX = /^\s*\$\s*([a-zA-Z0-9_]+)\s*=\s*(\d+)\s*$/;
 
 var ERROR_MESSAGE = "";
 
@@ -19,6 +21,9 @@ function remove_junk(lines) {
 
 function parse(lines) {
     var result = {
+        configs: {
+            autonext: 0,
+        },
         participantA: {
             name: null,
             sprites: {}
@@ -34,9 +39,26 @@ function parse(lines) {
     var name_has_been_found = false;
     var got_participants = false;
     var error = false;
+    var config_parsed = false;
     lines.forEach((line, index) => {
         if(error) return;
-        if(got_participants){
+        if(!config_parsed){
+            if(line.trim().length == 0) {
+                config_parsed = true;
+                return;
+            }
+            else if((found = line.match(CONFIG_REGEX)) != null){
+                result.configs[found[1]] = parseInt(found[2]);
+                return;
+            } else {
+                config_parsed = true;
+                /*
+                ERROR_MESSAGE = `error while parsing config keys:\nline ${index}: not a blank line or a config line!\ncorrect:< $config_key = config_value >\n\n${index}:< ${line} >`;
+                alert(ERROR_MESSAGE);
+                error = true;
+                */
+            }
+        } if(got_participants){
             if(line.trim().length == 0) return;
             else if((found = line.match(LINE_REGEX)) != null){
                 var object = {
@@ -106,7 +128,13 @@ function produce_lua(input) {
         result += `{subject="${line.subject}",text="${line.text}",sprite="${line.sprite}",voice=${line.voice}},`;
     });
 
-    result += "}}\nreturn c"
+    result += "},";
+
+    for (let [key, value] of Object.entries(input.configs)) {
+        result += `${key}=${value},`;
+    }
+
+    result += "}\nreturn c";
 
     return result;
 }
@@ -124,10 +152,16 @@ function produce_pretty_lua(input) {
     }
     result += "        }\n    },\n    conversation = {\n";
     input.conversationLines.forEach((line) => {
-        result += `        {\n            subject = "${line.subject}",\n            text = "${line.text}",\n            sprite = "${line.sprite}",\n            voice=${line.voice}\n        },\n`;
+        result += `        {\n            subject = "${line.subject}",\n            text = "${line.text}",\n            sprite = "${line.sprite}",\n            voice = ${line.voice}\n        },\n`;
     });
 
-    result += "    }\n}\nreturn c"
+    result += "    },\n"; 
+
+    for (let [key, value] of Object.entries(input.configs)) {
+        result += `    ${key} = ${value},\n`;
+    }
+
+    result += "\n}\nreturn c";
 
     return result;
 }
